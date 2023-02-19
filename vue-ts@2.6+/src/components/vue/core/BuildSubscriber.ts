@@ -1,14 +1,12 @@
 import type EventSubscriber from "@/components/vue/core/EventSubscriber";
-import type RoutedEventArgs from "@/components/core/RoutedEventArgs";
-import type VueSubmission from "@/components/vue/core/VueSubmission";
-import type {Subscription} from "@/components/core/Flow";
-import type Vue from "vue";
+import type HubSubscription from "@/components/vue/core/HubSubscription";
+import type {VueRoutedEventArgs} from "@/components/vue/types";
 
 import Events from "@/components/vue/core/Events";
 
 export default class BuildSubscriber implements EventSubscriber {
-    accept(event: RoutedEventArgs<VueSubmission, Vue>): boolean {
-        return event.event === Events.BUILD;
+    accept(event: VueRoutedEventArgs): boolean {
+        return Events.BUILD === event.event;
     }
 
     onComplete(): void {
@@ -17,10 +15,11 @@ export default class BuildSubscriber implements EventSubscriber {
     onError(error: unknown): void {
     }
 
-    onNext(item: RoutedEventArgs<VueSubmission, Vue>): void {
+    onNext(item: VueRoutedEventArgs): void {
     }
 
-    onSubscribe(subscription: Subscription): void {
+    onSubscribe(subscription: HubSubscription): void {
+        subscription.request();
     }
 
 }

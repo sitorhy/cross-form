@@ -8,9 +8,9 @@ export interface Subscription {
 }
 
 // 订阅者标准接口
-export interface Subscriber<T> {
+export interface Subscriber<T, S extends Subscription> {
     // Publisher在被指定一个新的Subscriber时调用此方法
-    onSubscribe(subscription: Subscription): void;
+    onSubscribe(subscription: S): void;
 
     // 每当新的数据产生，这个方法会被调用
     onNext(item: T): void;
@@ -23,6 +23,6 @@ export interface Subscriber<T> {
 }
 
 // 发布者标准接口
-export interface Publisher<T, S extends Subscriber<T>> {
+export interface Publisher<T, K extends Subscription, S extends Subscriber<T, K>> {
     subscribe(subscriber: S): void;
 }

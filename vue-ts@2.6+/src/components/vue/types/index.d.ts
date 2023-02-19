@@ -1,4 +1,7 @@
-import type HubPublisher from "../core/HubPublisher";
+import HubPublisher from "@/components/vue/core/HubPublisher";
+import VueSubmission from "@/components/vue/core/VueSubmission";
+import RoutedEventArgs from "@/components/core/RoutedEventArgs";
+import Vue from "vue";
 
 declare module 'vue/types/vue' {
     interface Vue {
@@ -6,3 +9,5 @@ declare module 'vue/types/vue' {
         _uid: number
     }
 }
+
+export type VueRoutedEventArgs = RoutedEventArgs<VueSubmission, Vue>;
