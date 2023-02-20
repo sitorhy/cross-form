@@ -5,7 +5,7 @@ import type HubPublisher from "@/components/vue/core/HubPublisher";
 
 import HubSubscription from "@/components/vue/core/HubSubscription";
 
-export default class HubProcessorSubscription extends HubSubscription {
+export default abstract class HubProcessorSubscription extends HubSubscription {
     private readonly _processor: HubProcessor;
 
     get processor(): HubProcessor {
@@ -17,7 +17,5 @@ export default class HubProcessorSubscription extends HubSubscription {
         this._processor = processor;
     }
 
-    request() {
-
-    }
+    abstract request(): void;
 }

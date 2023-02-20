@@ -4,7 +4,6 @@ import type {VueRoutedEventArgs} from "@/components/vue/types";
 import type HubSubscription from "@/components/vue/core/HubSubscription";
 
 import BuildSubscriber from "@/components/vue/core/BuildSubscriber";
-import HubProcessorSubscription from "@/components/vue/core/HubProcessorSubscription";
 
 export default class HubProcessor implements Publisher<VueRoutedEventArgs, HubSubscription, EventSubscriber>, Subscriber<VueRoutedEventArgs, HubSubscription> {
     private _subscribers: EventSubscriber[] = [];
@@ -18,19 +17,22 @@ export default class HubProcessor implements Publisher<VueRoutedEventArgs, HubSu
     }
 
     onComplete(): void {
+
     }
 
     onError(error: unknown): void {
+
     }
 
     onNext(item: VueRoutedEventArgs): void {
+
     }
 
     onSubscribe(subscription: HubSubscription): void {
         for (const subscriber of this.subscribers) {
             if (!subscription.event.handled) {
                 if (subscriber.accept(subscription.event)) {
-                    subscriber.onSubscribe(new HubProcessorSubscription(subscription.subscriber, subscription.publisher, this, subscription.event));
+                    subscriber.onSubscribe(subscriber.delegate(subscription.subscriber, subscription.publisher, this, subscription.event));
                 } else {
                     subscription.request();
                 }
