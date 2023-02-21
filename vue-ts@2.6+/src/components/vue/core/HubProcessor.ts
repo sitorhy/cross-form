@@ -1,11 +1,13 @@
-import type {Publisher, Subscriber} from "@/components/core/Flow";
+import type {Publisher, Subscriber, Subscription} from "@/components/core/Flow";
 import type EventSubscriber from "@/components/vue/core/EventSubscriber";
 import type {VueRoutedEventArgs} from "@/components/vue/types";
 import type HubSubscription from "@/components/vue/core/HubSubscription";
+import type EventSubscription from "@/components/vue/core/EventSubscription";
 
 import BuildSubscriber from "@/components/vue/core/BuildSubscriber";
+import HubSubscriber from "@/components/vue/core/HubSubscriber";
 
-export default class HubProcessor implements Publisher<VueRoutedEventArgs, HubSubscription, EventSubscriber>, Subscriber<VueRoutedEventArgs, HubSubscription> {
+export default class HubProcessor extends HubSubscriber implements Publisher<VueRoutedEventArgs, HubSubscription, EventSubscriber> {
     private _subscribers: EventSubscriber[] = [];
 
     get subscribers(): EventSubscriber[] {
@@ -13,26 +15,15 @@ export default class HubProcessor implements Publisher<VueRoutedEventArgs, HubSu
     }
 
     constructor() {
+        super();
         this.subscribe(new BuildSubscriber());
     }
 
-    onComplete(): void {
-
-    }
-
-    onError(error: unknown): void {
-
-    }
-
-    onNext(item: VueRoutedEventArgs): void {
-
-    }
-
-    onSubscribe(subscription: HubSubscription): void {
+    onSubscribe(subscription: EventSubscription) {
         for (const subscriber of this.subscribers) {
             if (!subscription.event.handled) {
                 if (subscriber.accept(subscription.event)) {
-                    subscriber.onSubscribe(subscriber.delegate(subscription.subscriber, subscription.publisher, this, subscription.event));
+                    subscriber.onSubscribe(subscriber.delegate(subscription, this));
                 } else {
                     subscription.request();
                 }
@@ -47,5 +38,4 @@ export default class HubProcessor implements Publisher<VueRoutedEventArgs, HubSu
             this.subscribers.push(subscriber);
         }
     }
-
 }
