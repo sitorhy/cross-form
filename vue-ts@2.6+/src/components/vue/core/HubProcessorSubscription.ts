@@ -1,20 +1,34 @@
 import type HubProcessor from "@/components/vue/core/HubProcessor";
-import type {Subscriber} from "@/components/core/Flow";
-import type {VueRoutedEventArgs} from "@/components/vue/types";
-import type HubPublisher from "@/components/vue/core/HubPublisher";
+import type EventSubscription from "@/components/vue/core/EventSubscription";
+import type VueSubmission from "@/components/vue/core/VueSubmission";
+import type RoutedEventArgs from "@/components/core/RoutedEventArgs";
+import type Vue from "vue";
 
-import HubSubscription from "@/components/vue/core/HubSubscription";
+export default abstract class HubProcessorSubscription implements EventSubscription {
 
-export default abstract class HubProcessorSubscription extends HubSubscription {
+    private readonly _eventSubscription: EventSubscription;
+
     private readonly _processor: HubProcessor;
+
+    // 上一级订阅协议
+    get eventSubscription(): EventSubscription {
+        return this._eventSubscription;
+    }
 
     get processor(): HubProcessor {
         return this._processor;
     }
 
-    constructor(subscriber: Subscriber<VueRoutedEventArgs, HubSubscription>, publisher: HubPublisher, processor: HubProcessor, event: VueRoutedEventArgs) {
-        super(subscriber, publisher, event);
+    get event(): RoutedEventArgs<VueSubmission, Vue> {
+        return this.eventSubscription.event;
+    }
+
+    constructor(eventSubscription: EventSubscription, processor: HubProcessor) {
+        this._eventSubscription = eventSubscription;
         this._processor = processor;
+    }
+
+    cancel(): void {
     }
 
     abstract request(): void;

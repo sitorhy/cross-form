@@ -1,32 +1,35 @@
-import type {Subscriber, Subscription} from "@/components/core/Flow";
 import type RoutedEventArgs from "@/components/core/RoutedEventArgs";
 import type VueSubmission from "@/components/vue/core/VueSubmission";
 import type HubPublisher from "@/components/vue/core/HubPublisher";
 import type {VueRoutedEventArgs} from "@/components/vue/types";
+import type EventSubscription from "@/components/vue/core/EventSubscription";
+import type HubSubscriber from "@/components/vue/core/HubSubscriber";
+import type Vue from "vue";
 
 
-export default class HubSubscription implements Subscription {
-    private readonly _subscriber: Subscriber<VueRoutedEventArgs, HubSubscription>;
+export default class HubSubscription implements EventSubscription {
 
     private readonly _publisher: HubPublisher;
 
-    private readonly _event: RoutedEventArgs<VueSubmission, Vue>;
+    private readonly _subscriber: HubSubscriber;
 
-    get subscriber(): Subscriber<VueRoutedEventArgs, HubSubscription> {
-        return this._subscriber;
-    }
+    private readonly _event: RoutedEventArgs<VueSubmission, Vue>;
 
     get publisher(): HubPublisher {
         return this._publisher;
+    }
+
+    get subscriber(): HubSubscriber {
+        return this._subscriber;
     }
 
     get event(): RoutedEventArgs<VueSubmission, Vue> {
         return this._event;
     }
 
-    constructor(subscriber: Subscriber<VueRoutedEventArgs, HubSubscription>, publisher: HubPublisher, event: VueRoutedEventArgs) {
-        this._subscriber = subscriber;
+    constructor(publisher: HubPublisher, subscriber: HubSubscriber, event: VueRoutedEventArgs) {
         this._publisher = publisher;
+        this._subscriber = subscriber;
         this._event = event;
     }
 
@@ -37,7 +40,10 @@ export default class HubSubscription implements Subscription {
         }
     }
 
+    /**
+     * 默认的闭环实现，重载实现以汇总处理下一级订阅数据
+     */
     request(): void {
-
+        this.subscriber.onComplete();
     }
 }

@@ -1,13 +1,16 @@
-import type {Publisher, Subscriber, Subscription} from "@/components/core/Flow";
+import type {Publisher} from "@/components/core/Flow";
 import type {VueRoutedEventArgs} from "@/components/vue/types";
+import type EventSubscription from "@/components/vue/core/EventSubscription";
+import type HubSubscriber from "@/components/vue/core/HubSubscriber";
 
 import HubSubscription from "@/components/vue/core/HubSubscription";
 import HubProcessor from "@/components/vue/core/HubProcessor";
 
-export default class HubPublisher implements Publisher<VueRoutedEventArgs, Subscription, Subscriber<VueRoutedEventArgs, Subscription>> {
-    private _subscribers: Subscriber<VueRoutedEventArgs, Subscription>[] = [];
+export default class HubPublisher implements Publisher<VueRoutedEventArgs, EventSubscription, HubSubscriber> {
 
-    get subscribers(): Subscriber<VueRoutedEventArgs, Subscription>[] {
+    private _subscribers: HubSubscriber[] = [];
+
+    get subscribers(): HubSubscriber[] {
         return this._subscribers;
     }
 
@@ -15,19 +18,31 @@ export default class HubPublisher implements Publisher<VueRoutedEventArgs, Subsc
         this.subscribe(new HubProcessor());
     }
 
-    subscribe(subscriber: Subscriber<VueRoutedEventArgs, Subscription>): void {
-        if (!this.subscribers.includes(subscriber)) {
-            this.subscribers.push(subscriber);
-        }
+    protected dispatch(subscriber: HubSubscriber, event: VueRoutedEventArgs) {
+        subscriber.onSubscribe(new HubSubscription(this, subscriber, event));
     }
 
     submit(event: VueRoutedEventArgs) {
         for (const subscriber of this.subscribers) {
             if (!event.handled) {
-                subscriber.onSubscribe(new HubSubscription(subscriber, this, event));
+                if (subscriber) {
+                    try {
+                        this.dispatch(subscriber, event);
+                    } catch (e: unknown) {
+                        // 捕获大部分同步订阅器异常
+                        subscriber.onError(e);
+                    }
+                }
             } else {
                 break;
             }
         }
     }
+
+    subscribe(subscriber: HubSubscriber): void {
+        if (subscriber && !this.subscribers.includes(subscriber)) {
+            this.subscribers.push(subscriber);
+        }
+    }
+
 }

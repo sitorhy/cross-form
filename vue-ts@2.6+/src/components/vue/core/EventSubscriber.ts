@@ -1,12 +1,20 @@
 import type {Subscriber} from "@/components/core/Flow";
-import type HubSubscription from "@/components/vue/core/HubSubscription";
 import type {VueRoutedEventArgs} from "@/components/vue/types";
 import type HubProcessorSubscription from "@/components/vue/core/HubProcessorSubscription";
-import type HubPublisher from "@/components/vue/core/HubPublisher";
 import type HubProcessor from "@/components/vue/core/HubProcessor";
+import type EventSubscription from "@/components/vue/core/EventSubscription";
 
-export default interface EventSubscriber extends Subscriber<VueRoutedEventArgs, HubSubscription> {
+export default interface EventSubscriber extends Subscriber<VueRoutedEventArgs, EventSubscription> {
+    /**
+     * 订阅器是否受理事件
+     * @param event
+     */
     accept(event: VueRoutedEventArgs): boolean;
 
-    delegate(subscriber: Subscriber<VueRoutedEventArgs, HubSubscription>, publisher: HubPublisher, processor: HubProcessor, event: VueRoutedEventArgs): HubProcessorSubscription;
+    /**
+     * 事件、事件处理协议、订阅器是一组的，由订阅器指定协议更为合理
+     * @param subscription
+     * @param processor
+     */
+    delegate(subscription: EventSubscription, processor: HubProcessor): HubProcessorSubscription;
 }

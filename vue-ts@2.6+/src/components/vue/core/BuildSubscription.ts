@@ -2,7 +2,7 @@ import HubProcessorSubscription from "@/components/vue/core/HubProcessorSubscrip
 
 export default class BuildSubscription extends HubProcessorSubscription {
     request(): void {
-        throw new Error("Method not implemented.");
+        
     }
-
+    
 }
