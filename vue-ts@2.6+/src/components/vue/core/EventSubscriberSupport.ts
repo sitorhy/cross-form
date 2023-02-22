@@ -28,5 +28,4 @@ export default abstract class EventSubscriberSupport implements EventSubscriber 
     onSubscribe(subscription: EventSubscription): void {
         subscription.request();
     }
-
 }
