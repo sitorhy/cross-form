@@ -6,13 +6,13 @@ import type EventSubscription from "@/components/vue/core/EventSubscription";
 
 export default interface EventSubscriber extends Subscriber<VueRoutedEventArgs, EventSubscription> {
     /**
-     * ¶©ÔÄÆ÷ÊÇ·ñÊÜÀíÊÂ¼ş
+     * è®¢é˜…å™¨æ˜¯å¦å—ç†äº‹ä»¶
      * @param event
      */
     accept(event: VueRoutedEventArgs): boolean;
 
     /**
-     * ÊÂ¼ş¡¢ÊÂ¼ş´¦ÀíĞ­Òé¡¢¶©ÔÄÆ÷ÊÇÒ»×éµÄ£¬ÓÉ¶©ÔÄÆ÷Ö¸¶¨Ğ­Òé¸üÎªºÏÀí
+     * äº‹ä»¶ã€äº‹ä»¶å¤„ç†åè®®ã€è®¢é˜…å™¨æ˜¯ä¸€ç»„çš„ï¼Œç”±è®¢é˜…å™¨æŒ‡å®šåè®®æ›´ä¸ºåˆç†
      * @param subscription
      * @param processor
      */

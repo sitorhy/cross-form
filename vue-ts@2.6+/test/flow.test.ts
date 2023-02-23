@@ -2,7 +2,7 @@ import type {VueRoutedEventArgs} from "../src/components/vue/types";
 import type HubSubscription from "../src/components/vue/core/HubSubscription";
 import type EventSubscription from "../src/components/vue/core/EventSubscription";
 
-import {describe, expect, test} from "@jest/globals";
+import {describe, expect, jest, test} from "@jest/globals";
 import HubPublisher from "../src/components/vue/core/HubPublisher";
 import VueSubmission from "../src/components/vue/core/VueSubmission";
 import RoutedEventArgs from "../src/components/core/RoutedEventArgs";
@@ -12,10 +12,35 @@ import HubProcessor from "../src/components/vue/core/HubProcessor";
 import HubSubscriber from "../src/components/vue/core/HubSubscriber";
 import Vue from "vue";
 
+(function () {
+    // HubSubscriber 闭环处理检查 没有输出即流程闭环有问题
+    const onSubscribe = HubSubscriber.prototype.onSubscribe;
+    HubSubscriber.prototype.onSubscribe = function (s) {
+        console.log('HubSubscriber.onSubscribe');
+        onSubscribe.call(this, s);
+    };
+
+    const onComplete = HubSubscriber.prototype.onComplete;
+    HubSubscriber.prototype.onComplete = function () {
+        console.log('HubSubscriber.onComplete');
+        onComplete.call(this);
+    };
+})();
+
+(function () {
+    // HubProcessor 闭环处理检查 由于 HubSubscriber.onSubscribe 被重载 HubSubscriber Hook不会被调用
+    const onSubscribe = HubProcessor.prototype.onSubscribe;
+    HubProcessor.prototype.onSubscribe = function (s) {
+        console.log('HubProcessor.onSubscribe');
+        onSubscribe.call(this, s);
+    };
+})();
+
 
 class InnerEventSubscription extends HubProcessorSubscription {
     request() {
         console.log(`Type of subscription: ${this.constructor.name}`);
+        this.subscriber.onComplete();
     }
 }
 
@@ -28,7 +53,7 @@ class InnerEventSubscriber extends EventSubscriberSupport {
     }
 
     delegate(subscription: EventSubscription, processor: HubProcessor): HubProcessorSubscription {
-        return new InnerEventSubscription(subscription, processor);
+        return new InnerEventSubscription(subscription, processor, this);
     }
 }
 

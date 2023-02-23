@@ -9,6 +9,7 @@ import HubSubscriber from "@/components/vue/core/HubSubscriber";
 export default class HubProcessor extends HubSubscriber implements Publisher<VueRoutedEventArgs, EventSubscription, EventSubscriber> {
     private _subscribers: EventSubscriber[] = [];
 
+
     get subscribers(): EventSubscriber[] {
         return this._subscribers;
     }
@@ -22,12 +23,14 @@ export default class HubProcessor extends HubSubscriber implements Publisher<Vue
         for (const subscriber of this.subscribers) {
             if (!subscription.event.handled) {
                 if (subscriber.accept(subscription.event)) {
+                    // 转发
                     subscriber.onSubscribe(subscriber.delegate(subscription, this));
                 }
             } else {
                 break;
             }
         }
+        // 闭环
         subscription.request();
     }
 

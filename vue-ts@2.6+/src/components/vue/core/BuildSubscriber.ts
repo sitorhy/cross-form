@@ -13,7 +13,7 @@ export default class BuildSubscriber extends EventSubscriberSupport {
     }
 
     delegate(subscription: EventSubscription, processor: HubProcessor): HubProcessorSubscription {
-        return new BuildSubscription(subscription, processor);
+        return new BuildSubscription(subscription, processor, this);
     }
 
 }

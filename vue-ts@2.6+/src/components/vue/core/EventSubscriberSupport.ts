@@ -9,8 +9,14 @@ export default abstract class EventSubscriberSupport implements EventSubscriber 
 
     abstract delegate(subscription: EventSubscription, processor: HubProcessor): HubProcessorSubscription;
 
-    onComplete(): void {
+    private _subscription: EventSubscription | undefined;
 
+    get subscription(): EventSubscription | undefined {
+        return this._subscription;
+    }
+
+    onComplete(): void {
+        
     }
 
     onError(error: unknown): void {
@@ -26,6 +32,7 @@ export default abstract class EventSubscriberSupport implements EventSubscriber 
      * @param subscription
      */
     onSubscribe(subscription: EventSubscription): void {
+        this._subscription = subscription;
         subscription.request();
     }
 }
