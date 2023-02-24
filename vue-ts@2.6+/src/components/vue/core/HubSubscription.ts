@@ -1,10 +1,7 @@
-import type RoutedEventArgs from "@/components/core/RoutedEventArgs";
-import type VueSubmission from "@/components/vue/core/VueSubmission";
 import type HubPublisher from "@/components/vue/core/HubPublisher";
 import type {VueRoutedEventArgs} from "@/components/vue/types";
 import type EventSubscription from "@/components/vue/core/EventSubscription";
 import type HubSubscriber from "@/components/vue/core/HubSubscriber";
-import type Vue from "vue";
 
 
 export default class HubSubscription implements EventSubscription {
@@ -13,7 +10,7 @@ export default class HubSubscription implements EventSubscription {
 
     private readonly _subscriber: HubSubscriber;
 
-    private readonly _event: RoutedEventArgs<VueSubmission, Vue>;
+    private readonly _event: VueRoutedEventArgs;
 
     get publisher(): HubPublisher {
         return this._publisher;
@@ -23,7 +20,7 @@ export default class HubSubscription implements EventSubscription {
         return this._subscriber;
     }
 
-    get event(): RoutedEventArgs<VueSubmission, Vue> {
+    get event(): VueRoutedEventArgs {
         return this._event;
     }
 

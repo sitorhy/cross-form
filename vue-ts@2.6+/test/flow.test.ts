@@ -2,7 +2,7 @@ import type {VueRoutedEventArgs} from "../src/components/vue/types";
 import type HubSubscription from "../src/components/vue/core/HubSubscription";
 import type EventSubscription from "../src/components/vue/core/EventSubscription";
 
-import {describe, expect, jest, test} from "@jest/globals";
+import {describe, expect, test} from "@jest/globals";
 import HubPublisher from "../src/components/vue/core/HubPublisher";
 import VueSubmission from "../src/components/vue/core/VueSubmission";
 import RoutedEventArgs from "../src/components/core/RoutedEventArgs";

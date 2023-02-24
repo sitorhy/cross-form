@@ -1,9 +1,7 @@
 import type HubProcessor from "@/components/vue/core/HubProcessor";
 import type EventSubscription from "@/components/vue/core/EventSubscription";
-import type VueSubmission from "@/components/vue/core/VueSubmission";
-import type RoutedEventArgs from "@/components/core/RoutedEventArgs";
-import type Vue from "vue";
 import type EventSubscriber from "@/components/vue/core/EventSubscriber";
+import type {VueRoutedEventArgs} from "@/components/vue/types";
 
 export default abstract class HubProcessorSubscription implements EventSubscription {
 
@@ -26,7 +24,7 @@ export default abstract class HubProcessorSubscription implements EventSubscript
         return this._subscriber;
     }
 
-    get event(): RoutedEventArgs<VueSubmission, Vue> {
+    get event(): VueRoutedEventArgs {
         return this.sourceSubscription.event;
     }
 
