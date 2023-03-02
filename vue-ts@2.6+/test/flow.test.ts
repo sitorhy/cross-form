@@ -25,6 +25,12 @@ import Vue from "vue";
         console.log('HubSubscriber.onComplete');
         onComplete.call(this);
     };
+
+    const onError = HubSubscriber.prototype.onError;
+    HubSubscriber.prototype.onError = function (e) {
+        console.log(`HubSubscriber.onError: ${e}`);
+        onError.call(this, e);
+    };
 })();
 
 (function () {
@@ -34,6 +40,12 @@ import Vue from "vue";
         console.log('HubProcessor.onSubscribe');
         onSubscribe.call(this, s);
     };
+
+    const onError = HubProcessor.prototype.onError;
+    HubProcessor.prototype.onError = function (e) {
+        console.log(`HubProcessor.onError: ${e}`);
+        onError.call(this, e);
+    };
 })();
 
 
@@ -41,6 +53,12 @@ class InnerEventSubscription extends HubProcessorSubscription {
     request() {
         console.log(`Type of subscription: ${this.constructor.name}`);
         this.subscriber.onComplete();
+    }
+}
+
+class ErrorEventSubscription extends HubProcessorSubscription {
+    request() {
+        throw new Error('Exception Caught');
     }
 }
 
@@ -54,6 +72,16 @@ class InnerEventSubscriber extends EventSubscriberSupport {
 
     delegate(subscription: EventSubscription, processor: HubProcessor): HubProcessorSubscription {
         return new InnerEventSubscription(subscription, processor, this);
+    }
+}
+
+class ErrorEventSubscriber extends EventSubscriberSupport {
+    accept(event: VueRoutedEventArgs): boolean {
+        return event.event === 'ERROR';
+    }
+
+    delegate(subscription: EventSubscription, processor: HubProcessor): HubProcessorSubscription {
+        return new ErrorEventSubscription(subscription, processor, this);
     }
 }
 
@@ -99,5 +127,15 @@ describe('框架流程测试', () => {
         publisher.subscribe(new CustomPublicSubscriber());
         const event: VueRoutedEventArgs = new RoutedEventArgs<VueSubmission, Vue>(vm, 'CUSTOM', submission);
         publisher.submit(event);
+    });
+
+    test('异常捕获测试', () => {
+        const processor = publisher.subscribers.find(i => i instanceof HubProcessor) as HubProcessor;
+        expect(processor).toBeTruthy();
+        if (processor) {
+            processor.subscribe(new ErrorEventSubscriber());
+            const event: VueRoutedEventArgs = new RoutedEventArgs<VueSubmission, Vue>(vm, 'ERROR', submission);
+            publisher.submit(event);
+        }
     });
 });

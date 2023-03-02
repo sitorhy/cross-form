@@ -9,14 +9,14 @@ export default abstract class EventSubscriberSupport implements EventSubscriber 
 
     abstract delegate(subscription: EventSubscription, processor: HubProcessor): HubProcessorSubscription;
 
-    private _subscription: EventSubscription | undefined;
+    private _subscription: EventSubscription | null = null;
 
-    get subscription(): EventSubscription | undefined {
+    get subscription(): EventSubscription | null {
         return this._subscription;
     }
 
     onComplete(): void {
-        
+
     }
 
     onError(error: unknown): void {

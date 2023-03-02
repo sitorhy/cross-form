@@ -28,5 +28,21 @@ export interface Description {
 }
 
 export interface Document {
+    /**
+     * 根据描述对象创建关系容器
+     * @param description
+     */
     draft(description: Description): Relation;
+
+    /**
+     * 是否存在符合描述的容器
+     * @param description
+     */
+    contain(description: Description): boolean;
+
+    /**
+     * 根据符合描述的关系容器
+     * @param description
+     */
+    query(description: Description): Relation | null;
 }
