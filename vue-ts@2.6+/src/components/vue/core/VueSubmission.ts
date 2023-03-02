@@ -4,16 +4,16 @@ import type Submission from "@/components/core/Submission";
 
 export default class VueSubmission implements Submission {
     errors?: ValidateError[];
-    form: string | null;
+    relation: string | null;
     id: string;
-    name: string | Array<string | number> | null;
+    member?: string | Array<string | number> | null;
     rules?: Rule;
     value: any;
     window?: string;
 
-    constructor(form: string | number | null = null, name: string | number | null = null) {
+    constructor(relation: string | number | null = null, member: string | number | null = null) {
         this.id = uuid();
-        this.form = form ? form.toString() : null;
-        this.name = name ? name.toString() : null;
+        this.relation = relation ? relation.toString() : null;
+        this.member = member ? member.toString() : null;
     }
 }
