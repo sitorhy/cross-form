@@ -2,7 +2,7 @@ import type {VueRoutedEventArgs} from "../src/components/vue/types";
 import type HubSubscription from "../src/components/vue/core/HubSubscription";
 import type EventSubscription from "../src/components/vue/core/EventSubscription";
 
-import {describe, expect, test} from "@jest/globals";
+import {describe, expect, jest, test} from "@jest/globals";
 import HubPublisher from "../src/components/vue/core/HubPublisher";
 import VueSubmission from "../src/components/vue/core/VueSubmission";
 import RoutedEventArgs from "../src/components/core/RoutedEventArgs";
@@ -38,7 +38,13 @@ import Vue from "vue";
     const onSubscribe = HubProcessor.prototype.onSubscribe;
     HubProcessor.prototype.onSubscribe = function (s) {
         console.log('HubProcessor.onSubscribe');
-        onSubscribe.call(this, s);
+        onSubscribe.call(this, s); // 转发
+    };
+
+    const onComplete = HubProcessor.prototype.onComplete;
+    HubProcessor.prototype.onComplete = function () {
+        console.log('HubProcessor.onComplete');
+        onComplete.call(this);
     };
 
     const onError = HubProcessor.prototype.onError;
@@ -58,7 +64,26 @@ class InnerEventSubscription extends HubProcessorSubscription {
 
 class ErrorEventSubscription extends HubProcessorSubscription {
     request() {
-        throw new Error('Exception Caught');
+        throw new Error('Sync Exception Thrown');
+    }
+}
+
+class AsyncEventSubscription extends HubProcessorSubscription {
+    request() {
+        const data = [114, 514, 1919810];
+        Promise.all(data.map((i, j) => {
+            return new Promise<void>(resolve => {
+                setTimeout(() => {
+                    this.event.data.extra = {
+                        num: i
+                    };
+                    this.subscriber.onNext(this.event);
+                    resolve();
+                }, 1000 * (j + 1));
+            });
+        })).then(() => {
+            this.subscriber.onComplete();
+        });
     }
 }
 
@@ -82,6 +107,26 @@ class ErrorEventSubscriber extends EventSubscriberSupport {
 
     delegate(subscription: EventSubscription, processor: HubProcessor): HubProcessorSubscription {
         return new ErrorEventSubscription(subscription, processor, this);
+    }
+}
+
+class AsyncEventSubscriber extends EventSubscriberSupport {
+    accept(event: VueRoutedEventArgs): boolean {
+        return event.event === 'ASYNC';
+    }
+
+    delegate(subscription: EventSubscription, processor: HubProcessor): HubProcessorSubscription {
+        return new AsyncEventSubscription(subscription, processor, this);
+    }
+
+    onNext(item: VueRoutedEventArgs) {
+        if (item.data.extra) {
+            console.log(item.data.extra['num']);
+        }
+    }
+
+    onComplete() {
+        console.log('AsyncEventSubscriber.onComplete');
     }
 }
 
@@ -137,5 +182,19 @@ describe('框架流程测试', () => {
             const event: VueRoutedEventArgs = new RoutedEventArgs<VueSubmission, Vue>(vm, 'ERROR', submission);
             publisher.submit(event);
         }
+    });
+
+    test('异步测试', () => {
+        const timer = jest.setTimeout(5000);
+        timer.useFakeTimers();
+        const processor = publisher.subscribers.find(i => i instanceof HubProcessor) as HubProcessor;
+        expect(processor).toBeTruthy();
+        if (processor) {
+            processor.subscribe(new AsyncEventSubscriber());
+            const event: VueRoutedEventArgs = new RoutedEventArgs<VueSubmission, Vue>(vm, 'ASYNC', submission);
+            publisher.submit(event);
+        }
+        timer.runAllTimers();
+        timer.useRealTimers();
     });
 });
