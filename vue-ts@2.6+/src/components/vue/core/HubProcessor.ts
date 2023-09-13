@@ -7,12 +7,12 @@ import type {Document} from "@/components/core/Document";
 import BuildSubscriber from "@/components/vue/core/BuildSubscriber";
 import HubSubscriber from "@/components/vue/core/HubSubscriber";
 import MemoryDocument from "@/components/vue/core/MemoryDocument";
+import RegisterSubscriber from "@/components/vue/core/RegisterSubscriber";
 
 export default class HubProcessor extends HubSubscriber implements Publisher<VueRoutedEventArgs, EventSubscription, EventSubscriber> {
     private _subscribers: EventSubscriber[] = [];
 
     private readonly _document: Document;
-
 
     get subscribers(): EventSubscriber[] {
         return this._subscribers;
@@ -25,6 +25,7 @@ export default class HubProcessor extends HubSubscriber implements Publisher<Vue
     constructor() {
         super();
         this.subscribe(new BuildSubscriber());
+        this.subscribe(new RegisterSubscriber());
         this._document = new MemoryDocument();
     }
 

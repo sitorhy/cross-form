@@ -5,14 +5,14 @@ import type EventSubscription from "@/components/vue/core/EventSubscription";
 
 import Events from "@/components/vue/core/Events";
 import EventSubscriberSupport from "@/components/vue/core/EventSubscriberSupport";
-import BuildSubscription from "@/components/vue/core/BuildSubscription";
+import RegisterSubscription from "@/components/vue/core/RegisterSubscription";
 
-export default class BuildSubscriber extends EventSubscriberSupport {
+export default class RegisterSubscriber extends EventSubscriberSupport {
     accept(event: VueRoutedEventArgs): boolean {
-        return Events.BUILD === event.event;
+        return Events.REGISTER === event.event;
     }
 
     delegate(subscription: EventSubscription, processor: HubProcessor): HubProcessorSubscription {
-        return new BuildSubscription(subscription, processor, this);
+        return new RegisterSubscription(subscription, processor, this);
     }
 }

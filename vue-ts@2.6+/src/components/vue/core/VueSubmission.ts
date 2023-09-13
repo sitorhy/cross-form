@@ -1,15 +1,18 @@
-import {v4 as uuid} from "uuid";
 import type {Rule, ValidateError} from "@/components/core/Validator";
 import type Submission from "@/components/core/Submission";
+import type {Description} from "@/components/core/Document";
+import type VueRelationDescription from "@/components/vue/core/VueRelationDescription";
+
+import {v4 as uuid} from "uuid";
 
 export default class VueSubmission implements Submission {
     errors?: ValidateError[];
 
-    relation: string | null;
+    description?: Description;
 
     id: string;
 
-    member?: string | Array<string | number> | null;
+    member?: string | null;
 
     rules?: Rule;
 
@@ -19,9 +22,9 @@ export default class VueSubmission implements Submission {
 
     extra: Record<any, any> | null | undefined;
 
-    constructor(relation: string | number | null = null, member: string | number | null = null) {
+    constructor(relation: string | number | null = null, member: string | number | null = null, description?: VueRelationDescription) {
         this.id = uuid();
-        this.relation = relation ? relation.toString() : null;
+        this.description = description;
         this.member = member ? member.toString() : null;
         this.extra = null;
     }
