@@ -6,7 +6,7 @@ import Vue from "vue";
 import Component from "vue-class-component";
 
 
-// 只有一个子节点，默认该节点是输入控件，存在当个子组件时进行定义筛选
+// 只有一个子节点，默认该节点是输入控件，存在多个子组件时进行默认筛选
 function getFirstComponent(slot: VNode[]): VNode | null | undefined {
     if (slot.length === 1) {
         return slot[0];
